@@ -41,14 +41,15 @@ public class Image {
         return this;
     }
 
-    void downloadImage(final String imageName) {
+    public void downloadImage(final String imageName) {
+        Image thisImage = this;
         Callback<ResponseBody> callback = new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     InputStream is = response.body().byteStream();
                     Bitmap bitmap = BitmapFactory.decodeStream(is);
-                    saveImage(bitmap, imageName);
+                    saveImage(thisImage, bitmap, imageName);
                 } else {
                     try {
                         Log.d("DEBUG", "response error: " + response.errorBody().string().toString());
@@ -68,7 +69,7 @@ public class Image {
 
     }
 
-    void downloadImage(final String imageName, Callback<ResponseBody> callback) {
+    public void downloadImage(final String imageName, Callback<ResponseBody> callback) {
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
 
         Call<ResponseBody> imageCall = apiInterface.downloadImage(this.getLarge(), imageName);
@@ -76,7 +77,7 @@ public class Image {
 
     }
 
-    void saveImage(Bitmap imageToSave, String fileName) {
+    public static void saveImage(Image image, Bitmap imageToSave, String fileName) {
         File dir = new File(MyApplication.getAppContext().getCacheDir(), "images");
         // create this directory if not already created
         dir.mkdir();
@@ -87,15 +88,15 @@ public class Image {
             imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
-            this.localPath = file.getAbsolutePath();
+            image.localPath = file.getAbsolutePath();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private Bitmap getBitmap() {
+    public Bitmap getBitmap() {
         if (this.localPath == null) {
-            throw new Error("Image not found");
+         return null;
         }
         File imgFile = new File(this.localPath);
         if (imgFile.exists()) {

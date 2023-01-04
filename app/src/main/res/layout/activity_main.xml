@@ -8,10 +8,11 @@
 
     <ImageView
         android:id="@+id/appPictureHomePage"
-        android:layout_width="229dp"
-        android:layout_height="186dp"
-        android:layout_marginTop="272dp"
+        android:layout_width="235dp"
+        android:layout_height="224dp"
+        android:layout_marginTop="252dp"
         android:contentDescription="portrait of a muscled man with sunglasses"
+        android:foreground="@drawable/icon_launcher_foreground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

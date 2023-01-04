@@ -13,11 +13,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Intent smashOrPassIntent = new Intent(this, SmashOrPassActivity.class);
+
         Button startButton = findViewById(R.id.start_button);
         startButton.setOnClickListener(v -> {
             //switch to SmashOrPassActivity
-            Intent intent = new Intent(this, SmashOrPassActivity.class);
-            startActivity(intent);
+
+            startActivity(smashOrPassIntent);
         });
     }
 }

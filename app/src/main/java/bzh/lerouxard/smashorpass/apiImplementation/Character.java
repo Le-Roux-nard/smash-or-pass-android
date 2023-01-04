@@ -113,4 +113,8 @@ public class Character {
     public void downloadImage(Callback<ResponseBody> callback) {
         this.getImage().downloadImage(this.getId() + ".jpg", callback);
     }
+
+    public String toString() {
+        return " (" + this.getId() + ")" + this.getName().getFull();
+    }
 }

@@ -5,6 +5,8 @@ import android.content.Context;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
+import java.io.File;
+
 public class MyApplication extends Application {
 
     private static Context context;
@@ -12,6 +14,11 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         MyApplication.context = getApplicationContext();
+        File cacheDir = getCacheDir();
+        File imageCacheDir = new File(cacheDir, "images");
+        if (imageCacheDir.exists()) {
+            imageCacheDir.delete();
+        }
     }
 
     public static Context getAppContext() {

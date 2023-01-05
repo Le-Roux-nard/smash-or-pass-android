@@ -33,7 +33,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SmashOrPassActivity extends AppCompatActivity {
-
+    private static final Integer MIN_CHARS_IN_LIST_TO_PROVIDE_CONTINUED_SERVICE = 15;
     ImageView imageView;
     private static List<Character> characterList = new ArrayList<Character>();
     private static boolean firstImage = true, firstCharacter = true;
@@ -45,35 +45,44 @@ public class SmashOrPassActivity extends AppCompatActivity {
             if (response.isSuccessful()) {
                 Log.i("DEBUG", "getRandomChar: successful");
                 ApiResponse result = response.body();
-                Character character = result.getData().getPage().getCharacters().get(0);
-                characterIdList.add(character.getId());
-                if (character.getImage().getLarge().equals("https://s4.anilist.co/file/anilistcdn/character/large/default.jpg") || characterList.contains(character)) {
-                    getRandomChar(randomCharCallback);
-                    return;
+                List<Character> characters = result.getData().getPage().getCharacters();
+                for (Character character : characters) {
+                    characterIdList.add(character.getId());
+                    Boolean defaultImageCheck = character.getImage().getLarge().equals("https://s4.anilist.co/file/anilistcdn/character/large/default.jpg");
+                    Boolean alreadySeenCheck = characterList.contains(character);
+                    Boolean hasGenderCheck = character.getGender() != null;
+                    Boolean hasGenderFilterCheck = MainActivity.filterGender != null;
+                    Boolean genderCheck = !hasGenderFilterCheck || (hasGenderFilterCheck && hasGenderCheck && character.getGender().equals(MainActivity.filterGender));
+
+                    if (!defaultImageCheck && !alreadySeenCheck && genderCheck) {
+                        characterList.add(character);
+                        character.downloadImage(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                Log.i("DEBUG", "getRandomChar: onResponse");
+                                if (response.isSuccessful()) {
+                                    InputStream is = response.body().byteStream();
+                                    Bitmap bitmap = BitmapFactory.decodeStream(is);
+                                    saveImage(character.getImage(), bitmap, character.getId() + ".jpg");
+                                    if (firstCharacter) {
+                                        firstCharacter = false;
+                                        loadNewCharacter(character);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                Log.e("DEBUG", t.toString());
+                                /// error response like disconnect to  server. failed to connect or etc....
+                            }
+
+                            ;
+                        });
+                    }
                 }
-                characterList.add(character);
-                character.downloadImage(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Log.i("DEBUG", "getRandomChar: onResponse");
-                        if (response.isSuccessful()) {
-                            InputStream is = response.body().byteStream();
-                            Bitmap bitmap = BitmapFactory.decodeStream(is);
-                            saveImage(character.getImage(), bitmap, character.getId() + ".jpg");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Log.e("DEBUG", t.toString());
-                        /// error response like disconnect to  server. failed to connect or etc....
-                    }
-
-                    ;
-                });
-                if (firstCharacter) {
-                    firstCharacter = false;
-                    loadNewCharacter(character);
+                if (characterList.size() < MIN_CHARS_IN_LIST_TO_PROVIDE_CONTINUED_SERVICE) {
+                    getRandomChars(randomCharCallback);
                 }
             }
         }
@@ -86,7 +95,7 @@ public class SmashOrPassActivity extends AppCompatActivity {
     private Button smashButton;
     private Button passButton;
     private View.OnClickListener defaultButtonClickListener = v -> {
-        getRandomChar(randomCharCallback);
+        getRandomChars(randomCharCallback);
         if (firstImage) {
             firstImage = false;
             characterList.remove(0);
@@ -95,6 +104,7 @@ public class SmashOrPassActivity extends AppCompatActivity {
             loadNewCharacter();
         } else {
             //alert with a notification that no characters are available right now
+            getRandomChars(randomCharCallback);
             Toast.makeText(MyApplication.getAppContext(), "Aucun personnage n'est disponible\nVeuillez patienter quelques instants", Toast.LENGTH_SHORT).show();
             smashButton.setEnabled(false);
             passButton.setEnabled(false);
@@ -113,9 +123,7 @@ public class SmashOrPassActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smash_or_pass);
-        for (int i = 0; i < 25; i++) {
-            getRandomChar(randomCharCallback);
-        }
+        getRandomChars(randomCharCallback);
 
         imageView = findViewById(R.id.CharacterPicture);
         smashButton = findViewById(R.id.button_smash);
@@ -130,10 +138,13 @@ public class SmashOrPassActivity extends AppCompatActivity {
     }
 
     private void loadNewCharacter(Character character) {
-        getRandomChar(randomCharCallback);
         if (character == null && characterList.size() > 0) {
             character = characterList.get(0);
             characterList.remove(0);
+
+            if (characterList.size() < MIN_CHARS_IN_LIST_TO_PROVIDE_CONTINUED_SERVICE) {
+                getRandomChars(randomCharCallback);
+            }
         }
         if (character == null) {
             return;
@@ -144,7 +155,6 @@ public class SmashOrPassActivity extends AppCompatActivity {
             character.getImage().downloadImage(character.getId() + ".jpg", new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.i("DEBUG", "getRandomChar: onResponse");
                     if (response.isSuccessful()) {
                         InputStream is = response.body().byteStream();
                         Bitmap bitmap = BitmapFactory.decodeStream(is);
@@ -165,7 +175,7 @@ public class SmashOrPassActivity extends AppCompatActivity {
         characterIdList.add(character.getId());
     }
 
-    private void getRandomChar(Callback<ApiResponse> arrayCallback) {
+    private void getRandomChars(Callback<ApiResponse> arrayCallback) {
         Log.i("DEBUG", "getRandomChar: début fonction");
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
         Call<ApiResponse> call = apiInterface.getRandomChar(new ApiQuery());

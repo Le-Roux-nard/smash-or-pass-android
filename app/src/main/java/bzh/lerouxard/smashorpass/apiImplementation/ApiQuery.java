@@ -7,15 +7,13 @@ import android.util.Log;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class ApiQuery {
-    private static String QUERY_STRING = "query charactersRandom ($pageNumber: Int, $not_in: [Int]) {Page(perPage: 1, page: $pageNumber) {characters(sort: FAVOURITES_DESC, id_not_in: $not_in) {id siteUrl image {large} name { native alternative alternativeSpoiler userPreferred full} gender media(perPage: 1, sort: POPULARITY_DESC) { nodes {title {romaji} isAdult}}}}}";
-    private static int MAX_CHARS_IN_API = 129169;
+    private static String QUERY_STRING = "query charactersRandom($perPage:Int,$pageNumber:Int,$not_in:[Int]){Page(perPage:$perPage,page:$pageNumber){pageInfo{perPage currentPage lastPage total}characters(sort:FAVOURITES_DESC,id_not_in:$not_in){id image{large}gender}}}";
+    private static int MAX_PAGE_IN_API = 2585;
     private List<Integer> last20RandomNumbers = new ArrayList<>();
 
     @SerializedName("variables")
@@ -40,14 +38,14 @@ public class ApiQuery {
             System.out.println(ignoreIdList);
             Integer randomPage;
             do {
-                randomPage = r.nextInt(MAX_CHARS_IN_API);
+                randomPage = r.nextInt(MAX_PAGE_IN_API);
             } while (last20RandomNumbers.contains(randomPage));
             if (last20RandomNumbers.size() >= 20) {
                 last20RandomNumbers.remove(0);
             }
             last20RandomNumbers.add(randomPage);
 
-            variables = "{\"pageNumber\":" + r.nextInt(MAX_CHARS_IN_API) + "," + ignoreIdList + "}";
+            variables = "{\"pageNumber\":" + r.nextInt(MAX_PAGE_IN_API) + "," + ignoreIdList + "}";
         } catch (Exception ex) {
             Log.e("DEBUG", ex.toString());
         }

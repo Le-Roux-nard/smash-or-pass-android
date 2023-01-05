@@ -12,21 +12,14 @@ public class Character {
     @SerializedName("id")
     @Expose
     private int id;
-    @SerializedName("siteUrl")
-    @Expose
-    private String siteUrl;
     @SerializedName("image")
     @Expose
     private Image image;
-    @SerializedName("name")
-    @Expose
-    private Name name;
     @SerializedName("gender")
     @Expose
-    private Object gender;
+    private String gender;
+
     @SerializedName("media")
-    @Expose
-    private Media media;
 
     public int getId() {
         return id;
@@ -38,19 +31,6 @@ public class Character {
 
     public Character withId(int id) {
         this.id = id;
-        return this;
-    }
-
-    public String getSiteUrl() {
-        return siteUrl;
-    }
-
-    public void setSiteUrl(String siteUrl) {
-        this.siteUrl = siteUrl;
-    }
-
-    public Character withSiteUrl(String siteUrl) {
-        this.siteUrl = siteUrl;
         return this;
     }
 
@@ -67,42 +47,16 @@ public class Character {
         return this;
     }
 
-    public Name getName() {
-        return name;
-    }
-
-    public void setName(Name name) {
-        this.name = name;
-    }
-
-    public Character withName(Name name) {
-        this.name = name;
-        return this;
-    }
-
-    public Object getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Object gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
-    public Character withGender(Object gender) {
+    public Character withGender(String gender) {
         this.gender = gender;
-        return this;
-    }
-
-    public Media getMedia() {
-        return media;
-    }
-
-    public void setMedia(Media media) {
-        this.media = media;
-    }
-
-    public Character withMedia(Media media) {
-        this.media = media;
         return this;
     }
 
@@ -115,6 +69,6 @@ public class Character {
     }
 
     public String toString() {
-        return " (" + this.getId() + ")" + this.getName().getFull();
+        return this.getId() + " (" + this.getGender() + ")";
     }
 }

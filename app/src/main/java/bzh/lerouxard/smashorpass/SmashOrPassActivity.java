@@ -2,7 +2,7 @@ package bzh.lerouxard.smashorpass;
 
 import static bzh.lerouxard.smashorpass.apiImplementation.Image.saveImage;
 
-import android.app.NotificationChannel;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -14,9 +14,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +33,13 @@ import retrofit2.Response;
 public class SmashOrPassActivity extends AppCompatActivity {
     private static final Integer MIN_CHARS_IN_LIST_TO_PROVIDE_CONTINUED_SERVICE = 15;
     ImageView imageView;
-    private static List<Character> characterList = new ArrayList<Character>();
+    private static List<Character> characterList = new ArrayList<>();
     private static boolean firstImage = true, firstCharacter = true;
     public static List<Integer> characterIdList = new ArrayList<Integer>();
+
+    private void noConnectionAlert(){
+        Toast.makeText(getApplicationContext(), "Internet Connection lost", Toast.LENGTH_SHORT).show();
+    }
     private Callback<ApiResponse> randomCharCallback = new Callback<ApiResponse>() {
         @Override
         public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
@@ -68,6 +70,8 @@ public class SmashOrPassActivity extends AppCompatActivity {
                                         firstCharacter = false;
                                         loadNewCharacter(character);
                                     }
+                                }else{
+                                    noConnectionAlert();
                                 }
                             }
 
@@ -84,6 +88,8 @@ public class SmashOrPassActivity extends AppCompatActivity {
                 if (characterList.size() < MIN_CHARS_IN_LIST_TO_PROVIDE_CONTINUED_SERVICE) {
                     getRandomChars(randomCharCallback);
                 }
+            }else{
+                noConnectionAlert();
             }
         }
 
@@ -94,6 +100,7 @@ public class SmashOrPassActivity extends AppCompatActivity {
     };
     private Button smashButton;
     private Button passButton;
+    private Button helpButton;
     private View.OnClickListener defaultButtonClickListener = v -> {
         getRandomChars(randomCharCallback);
         if (firstImage) {
@@ -128,9 +135,14 @@ public class SmashOrPassActivity extends AppCompatActivity {
         imageView = findViewById(R.id.CharacterPicture);
         smashButton = findViewById(R.id.button_smash);
         passButton = findViewById(R.id.button_pass);
+        helpButton = findViewById(R.id.helpBtn);
 
         smashButton.setOnClickListener(defaultButtonClickListener);
         passButton.setOnClickListener(defaultButtonClickListener);
+        helpButton.setOnClickListener(v -> {
+            Intent intent = new Intent(SmashOrPassActivity.this, HelpActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadNewCharacter() {

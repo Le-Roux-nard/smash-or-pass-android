@@ -59,15 +59,6 @@ public class Character {
         this.gender = gender;
         return this;
     }
-
-    public void downloadImage() {
-        this.getImage().downloadImage(this.getId() + ".jpg");
-    }
-
-    public void downloadImage(Callback<ResponseBody> callback) {
-        this.getImage().downloadImage(this.getId() + ".jpg", callback);
-    }
-
     public String toString() {
         return this.getId() + " (" + this.getGender() + ")";
     }

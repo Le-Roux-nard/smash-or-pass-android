@@ -1,6 +1,7 @@
 package bzh.lerouxard.smashorpass;
 
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;

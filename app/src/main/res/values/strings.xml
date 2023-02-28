@@ -2,5 +2,5 @@
     <string name="app_name">Smash or pass</string>
     <string name="help_title">Comment ça marche ?</string>
     <string name="help_content">Le principe est simple : \n\n
-    Une image va apparaitre au milieu de votre écran, en fonction de votre affinité avec le personnage vous pouvez décider de passer ce personnage ou de passer un bon moment avec lui/elle</string>
+    Une image va apparaitre au milieu de votre écran, vous pouvez faire glisser l\'image du personnage vers la gauche ou la droite en fonction de votre avis sur celui-ci (même principe que Tinder)</string>
 </resources>

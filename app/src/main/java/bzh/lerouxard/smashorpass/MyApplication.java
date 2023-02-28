@@ -2,9 +2,6 @@ package bzh.lerouxard.smashorpass;
 
 import android.app.Application;
 import android.content.Context;
-
-import androidx.appcompat.app.AppCompatDelegate;
-
 import java.io.File;
 
 public class MyApplication extends Application {
